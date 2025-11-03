@@ -1,0 +1,97 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+
+    /*
+     * Complete the 'formingMagicSquare' function below.
+     *
+     * The function is expected to return an INTEGER.
+     * The function accepts 2D_INTEGER_ARRAY s as parameter.
+     */
+
+public static int formingMagicSquare(List<List<int>> s)
+    {
+        // 1. Define all 8 possible 3x3 magic squares using digits 1-9.
+        // Each inner array represents one of the 8 unique magic squares, flattened into a 1D array of 9 elements.
+        int[][] magicSquares = new int[][]
+        {
+            // M1
+            new int[] { 8, 1, 6, 3, 5, 7, 4, 9, 2 },
+            // M2 (90-degree rotation of M1)
+            new int[] { 6, 1, 8, 7, 5, 3, 2, 9, 4 },
+            // M3 (180-degree rotation of M1)
+            new int[] { 4, 9, 2, 3, 5, 7, 8, 1, 6 },
+            // M4 (270-degree rotation of M1)
+            new int[] { 2, 9, 4, 7, 5, 3, 6, 1, 8 },
+            // M5 (Reflection of M1)
+            new int[] { 8, 3, 4, 1, 5, 9, 6, 7, 2 },
+            // M6 (90-degree rotation of M5)
+            new int[] { 4, 3, 8, 9, 5, 1, 2, 7, 6 },
+            // M7 (180-degree rotation of M5)
+            new int[] { 6, 7, 2, 1, 5, 9, 8, 3, 4 },
+            // M8 (270-degree rotation of M5)
+            new int[] { 2, 7, 6, 9, 5, 1, 4, 3, 8 }
+        };
+
+        // Flatten the input matrix 's' into a 1D array for easier comparison
+        // The input 's' is List<List<int>>, convert it to int[]
+        int[] inputFlat = s.SelectMany(row => row).ToArray();
+
+        // Initialize minimum cost to a high value
+        int minCost = int.MaxValue;
+
+        // 2. Iterate through all 8 possible magic squares
+        foreach (int[] magicSquare in magicSquares)
+        {
+            int currentCost = 0;
+
+            // 3. Calculate the cost to transform the input to the current magic square
+            for (int i = 0; i < 9; i++)
+            {
+                // Cost is the absolute difference between corresponding elements
+                currentCost += Math.Abs(inputFlat[i] - magicSquare[i]);
+            }
+
+            // 4. Update the minimum cost
+            minCost = Math.Min(minCost, currentCost);
+        }
+
+        // 5. Return the minimal cost found
+        return minCost;
+    }
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        List<List<int>> s = new List<List<int>>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            s.Add(Console.ReadLine().TrimEnd().Split(' ').ToList().Select(sTemp => Convert.ToInt32(sTemp)).ToList());
+        }
+
+        int result = Result.formingMagicSquare(s);
+
+        textWriter.WriteLine(result);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}

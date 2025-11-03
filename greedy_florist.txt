@@ -1,0 +1,56 @@
+using System;
+using System.Linq;
+
+class Solution 
+{
+    // Complete the getMinimumCost function below.
+    static int getMinimumCost(int k, int[] c) 
+    {
+        // n is the total number of flowers to buy
+        int n = c.Length;
+
+        // 1. Sort the flower prices in DESCENDING order (most expensive first).
+        // This ensures the cheapest flowers are purchased with the highest multipliers.
+        // We use an intermediate variable to hold the sorted array.
+        int[] sortedPrices = c.OrderByDescending(price => price).ToArray();
+
+        long minimumCost = 0;
+        
+        
+        for (int i = 0; i < n; i++)
+        {
+            int previousPurchases = i / k;
+            
+            // Cost Multiplier = 1 + previousPurchases
+            int multiplier = 1 + previousPurchases;
+            
+            // Cost for this flower = multiplier * original price
+            long cost = (long)multiplier * sortedPrices[i];
+            
+            minimumCost += cost;
+        }
+
+        return (int)minimumCost;
+    }
+
+    static void Main(string[] args) {
+        // ... (Main method code remains unchanged as it was provided and is correct for I/O) ...
+
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string[] nk = Console.ReadLine().Split(' ');
+
+        int n = Convert.ToInt32(nk[0]);
+
+        int k = Convert.ToInt32(nk[1]);
+
+        int[] c = Array.ConvertAll(Console.ReadLine().Split(' '), cTemp => Convert.ToInt32(cTemp));
+        
+        int minimumCost = getMinimumCost(k, c);
+
+        textWriter.WriteLine(minimumCost);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}

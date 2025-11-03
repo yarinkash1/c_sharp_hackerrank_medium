@@ -1,0 +1,79 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+
+    /*
+     * Complete the 'encryption' function below.
+     *
+     * The function is expected to return a STRING.
+     * The function accepts STRING s as parameter.
+     */
+
+     public static string encryption(string s)
+    {
+        // Remove spaces:
+        s = s.Replace(" ", ""); // Take the string s, and replace every space character " " with an empty string "".
+        int L = s.Length; // The length of the text without spaces.
+
+        // Calculate rows and columns:
+        double sqrtL = Math.Sqrt(L);
+        int rows = (int)Math.Floor(sqrtL); // lower bound
+        int cols = (int)Math.Ceiling(sqrtL); // upper bound
+
+        //If the grid is too small (not enough cells to fit all characters) then increase the number of rows by 1 to make more room
+        if (rows * cols < L)
+        {
+            rows++;
+        }
+            
+
+        // Build encrypted string
+        StringBuilder result = new StringBuilder();
+
+        for (int c = 0; c < cols; c++)
+        {
+            if (c > 0) result.Append(' ');
+            for (int r = 0; r < rows; r++)
+            {
+                int index = r * cols + c;
+                if (index < L)
+                {
+                   result.Append(s[index]); 
+                }
+            }
+        }
+
+        return result.ToString();
+    }
+}
+
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string s = Console.ReadLine();
+
+        string result = Result.encryption(s);
+
+        textWriter.WriteLine(result);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}

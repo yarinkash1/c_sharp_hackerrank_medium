@@ -1,0 +1,108 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+using System.Linq; // Required for LINQ extensions
+
+class Result
+{
+    /*
+     * Complete the 'climbingLeaderboard' function below.
+     *
+     * The function is expected to return an INTEGER_ARRAY.
+     * The function accepts following parameters:
+     * 1. INTEGER_ARRAY ranked (Leaderboard scores, descending)
+     * 2. INTEGER_ARRAY player (Player scores, ascending)
+     */
+    public static List<int> climbingLeaderboard(List<int> ranked, List<int> player)
+    {
+        // 1. Pre-process: Get the distinct scores from the ranked list.
+        // The scores are already descending, but we ensure distinctness.
+        // Converting to Array/List once is an efficient operation.
+        List<int> distinctRanked = ranked.Distinct().ToList();
+
+        // 2. Prepare the result list for the player's ranks
+        List<int> playerRanks = new List<int>(); 
+
+        // 3. Initialize the two pointers
+        
+        // 'i' points to the current player's score (iterating forward: worst to best)
+        // 'j' points to the leaderboard score (starting from the end/lowest rank: ascending comparison)
+        int rankedIndex = distinctRanked.Count - 1; // Start 'j' at the last (lowest) rank score
+
+        // 4. Iterate through the player's scores
+        foreach (int playerScore in player)
+        {
+            // Move the rankedIndex pointer backward as long as the player's score is higher than 
+            // the current ranked score. This is the core of the O(N+M) efficiency.
+            // Since player scores are increasing, the rankedIndex never has to reset.
+            while (rankedIndex >= 0 && playerScore >= distinctRanked[rankedIndex])
+            {
+                rankedIndex--;
+            }
+
+            // After the loop, the player's rank can be determined:
+            // The rank is (rankedIndex + 1) + 1. 
+            // Why +1? The distinct scores are ranked: 1, 2, 3, ... (count)
+            // If rankedIndex ends at distinctRanked.Count - 1 (the lowest score), 
+            // the next rank is distinctRanked.Count + 1.
+            
+            // Current Rank logic:
+            if (rankedIndex == -1)
+            {
+                // Case A: Player's score is greater than ALL distinct scores.
+                // The new rank is 1.
+                playerRanks.Add(1);
+            }
+            else if (playerScore == distinctRanked[rankedIndex])
+            {
+                // Case B: Player ties with distinctRanked[rankedIndex].
+                // The rank is the rank of that tied score: (rankedIndex + 1).
+                playerRanks.Add(rankedIndex + 1); 
+            }
+            else
+            {
+                // Case C: Player's score is less than distinctRanked[rankedIndex].
+                // The player's rank is one position lower than distinctRanked[rankedIndex].
+                // The rank is (rankedIndex + 1) + 1.
+                // e.g., If distinctRanked[rankedIndex] is rank 3, the player is rank 4.
+                playerRanks.Add(rankedIndex + 2);
+            }
+        }
+        
+        return playerRanks;
+    }
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        // I/O setup remains unchanged
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        int rankedCount = Convert.ToInt32(Console.ReadLine().Trim());
+
+        List<int> ranked = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(rankedTemp => Convert.ToInt32(rankedTemp)).ToList();
+
+        int playerCount = Convert.ToInt32(Console.ReadLine().Trim());
+
+        List<int> player = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(playerTemp => Convert.ToInt32(playerTemp)).ToList();
+
+        List<int> result = Result.climbingLeaderboard(ranked, player);
+
+        textWriter.WriteLine(String.Join("\n", result));
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}

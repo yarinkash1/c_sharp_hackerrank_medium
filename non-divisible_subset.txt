@@ -1,0 +1,99 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+
+    /*
+     * Complete the 'nonDivisibleSubset' function below.
+     *
+     * The function is expected to return an INTEGER.
+     * The function accepts following parameters:
+     *  1. INTEGER k
+     *  2. INTEGER_ARRAY s
+     */
+
+public static int nonDivisibleSubset(int k, List<int> s)
+    {
+        // 1. Count Remainders: Initialize an array to store the frequency of each remainder.
+        // The size is k, for remainders 0, 1, ..., k-1.
+        int[] remainderCounts = new int[k];
+
+        foreach (int num in s)
+        {
+            int remainder = num % k;
+            remainderCounts[remainder]++;
+        }
+
+        int maxLength = 0;
+
+        // 2. Handle Remainder 0: Add at most one element with remainder 0.
+        // If remainderCounts[0] is > 0, we can add 1 to the subset.
+        if (remainderCounts[0] > 0)
+        {
+            maxLength += 1;
+        }
+
+        // 3. Handle Paired Remainders: Iterate from remainder 1 up to k/2 (exclusive).
+        // The loop is efficient because it processes pairs (i, k-i) at once.
+        // Example k=4: processes i=1 and k-i=3.
+        for (int i = 1; i <= k / 2; i++)
+        {
+            int complementaryRemainder = k - i;
+
+            // 4. Handle Remainder k/2 (for even k): This is the special case where i == k-i.
+            // When k is even (e.g., k=6), this happens when i=3.
+            if (i == complementaryRemainder)
+            {
+                // We can only pick at most one number with remainder k/2.
+                if (remainderCounts[i] > 0)
+                {
+                    maxLength += 1;
+                }
+            }
+            else
+            {
+                // General case for non-complementary remainders (i, k-i).
+                // We must choose the larger count between the two, as we can't take both.
+                maxLength += Math.Max(remainderCounts[i], remainderCounts[complementaryRemainder]);
+            }
+        }
+
+        return maxLength;
+    }
+}
+
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string[] firstMultipleInput = Console.ReadLine().TrimEnd().Split(' ');
+
+        int n = Convert.ToInt32(firstMultipleInput[0]);
+
+        int k = Convert.ToInt32(firstMultipleInput[1]);
+
+        List<int> s = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(sTemp => Convert.ToInt32(sTemp)).ToList();
+
+        int result = Result.nonDivisibleSubset(k, s);
+
+        textWriter.WriteLine(result);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}

@@ -1,0 +1,96 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+    /*
+     * Complete the 'biggerIsGreater' function below.
+     *
+     * The function is expected to return a STRING.
+     * The function accepts STRING w as parameter.
+     */
+
+    public static string biggerIsGreater(string w)
+    {
+        // 1. Convert the string to a char array for manipulation
+        char[] chars = w.ToCharArray();
+        int n = chars.Length;
+        
+        // Step 1: Find the largest index 'i' such that chars[i] < chars[i + 1].
+        // The first character from the right that is smaller than its neighbor.
+        int i = n - 2;
+        while (i >= 0 && chars[i] >= chars[i + 1])
+        {
+            i--;
+        }
+        
+        // If no such index exists, the string is already the largest permutation (e.g., "dcba").
+        if (i < 0)
+        {
+            return "no answer";
+        }
+        
+        // Step 2: Find the largest index 'j' such that chars[j] > chars[i].
+        // This is the smallest element to the right of 'i' that is greater than chars[i].
+        int j = n - 1;
+        while (chars[j] <= chars[i])
+        {
+            j--;
+        }
+        
+        // Step 3: Swap chars[i] and chars[j].
+        char temp = chars[i];
+        chars[i] = chars[j];
+        chars[j] = temp;
+        
+        // Step 4: Reverse the suffix starting at index (i + 1).
+        // This makes the suffix the smallest possible permutation.
+        int left = i + 1;
+        int right = n - 1;
+        while (left < right)
+        {
+            temp = chars[left];
+            chars[left] = chars[right];
+            chars[right] = temp;
+            left++;
+            right--;
+        }
+        
+        // 5. Convert the char array back to a string and return
+        return new string(chars);
+    }
+
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        int T = Convert.ToInt32(Console.ReadLine().Trim());
+
+        for (int TItr = 0; TItr < T; TItr++)
+        {
+            string w = Console.ReadLine();
+
+            string result = Result.biggerIsGreater(w);
+
+            textWriter.WriteLine(result);
+        }
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
